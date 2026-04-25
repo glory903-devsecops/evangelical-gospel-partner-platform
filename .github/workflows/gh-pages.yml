@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      
       - name: Install Flutter
-        uses: subosito/flutter-action@f2c7f07530663d911a3d9021469e715694292b3a # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: 'stable'
 
@@ -25,7 +25,7 @@ jobs:
         run: flutter build web --release --base-href "/evangelical-gospel-partner-platform/"
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@4f9ac990e66d2146f84931a78368817b12267676 # v3.9.3
+        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
