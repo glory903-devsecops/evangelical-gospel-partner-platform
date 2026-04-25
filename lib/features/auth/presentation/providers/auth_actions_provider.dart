@@ -80,7 +80,7 @@ class AuthActions {
         // 신규 유저인 경우 프로필 생성
         final appUser = AppUserModel(
           uid: user.uid,
-          email: user.email,
+          email: user.email ?? '',
           name: user.displayName ?? '구글 사용자',
           tenantId: tenantId ?? 'unknown', // 기본값 혹은 전달받은 값
           role: UserRole.user,

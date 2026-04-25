@@ -76,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           unselectedItemColor: Colors.grey.shade400,
           backgroundColor: Colors.white,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.medium, fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
           elevation: 0,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home_rounded), activeIcon: Icon(Icons.home_filled), label: '홈'),
