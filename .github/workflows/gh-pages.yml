@@ -3,7 +3,18 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # 메인 브랜치에 푸시될 때 실행
+      - main
+
+# GitHub Pages 배포를 위한 권한 설정
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시 배포 방지
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -27,8 +38,18 @@ jobs:
           export PATH="$PATH:$HOME/flutter/bin"
           flutter build web --release --base-href "/evangelical-gospel-partner-platform/"
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          path: ./build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
