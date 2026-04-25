@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../providers/tenant_providers.dart';
 
-class TenantSelectPage extends StatelessWidget {
+class TenantSelectPage extends ConsumerWidget {
   const TenantSelectPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final List<Map<String, String>> tenants = [
       {'id': 'anguk', 'name': '안국역 전도 파트너'},
       {'id': 'samseong', 'name': '삼성역 전도 파트너'},
@@ -25,7 +26,11 @@ class TenantSelectPage extends StatelessWidget {
             child: ListTile(
               title: Text(tenant['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () => context.go('/home'), // 현재은 바로 홈으로 이동
+              onTap: () {
+                // 테넌트 ID 업데이트
+                ref.read(currentTenantIdProvider.notifier).state = tenant['id'];
+                context.go('/home');
+              },
             ),
           );
         },

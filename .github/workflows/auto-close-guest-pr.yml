@@ -1,4 +1,4 @@
-﻿name: Auto Close Guest PRs
+name: Auto Close Guest PRs
 on:
   pull_request_target:
     types: [opened]
@@ -9,7 +9,7 @@ jobs:
     if: github.event.pull_request.user.login != 'glory903-devsecops'
     steps:
       - name: Close Pull Request
-        uses: actions/github-script@v7
+        uses: actions/github-script@b7fb20003b14568853b49700344d6232709292d3 # v7.0.1
         with:
           script: |
             github.rest.issues.createComment({

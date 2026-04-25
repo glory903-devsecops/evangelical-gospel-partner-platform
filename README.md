@@ -40,8 +40,28 @@
 5. `09_TASK_BREAKDOWN.md` 기준으로 단계별 개발 요청
 6. 산출물 완료 시 `10_ACCEPTANCE_CHECKLIST.md`로 검수
 
-## 주의사항
-- 처음부터 모든 기능을 넣지 말고 **MVP 우선**으로 진행합니다.
-- React는 사용하지 않습니다.
-- Flutter + Firebase만 사용합니다.
-- 하나의 엔진으로 4개 테넌트를 운영하되, 데이터와 권한은 명확히 분리합니다.
+---
+
+## 로컬 실행 가이드 (Docker)
+
+본 프로젝트는 일관된 개발/테스트 환경을 위해 Docker 컨테이너 기반으로 구동됩니다.
+
+### 1. 웹 앱 빌드
+컨테이너 실행 전 최신 소스코드를 빌드해야 합니다.
+```bash
+flutter build web --release
+```
+
+### 2. Docker 컨테이너 실행
+Docker Compose를 사용하여 서버를 구동합니다.
+```bash
+# 컨테이너 빌드 및 실행 (백그라운드)
+docker-compose up -d --build
+
+# 실행 확인
+docker ps
+```
+
+### 3. 접속 정보
+*   **URL**: `http://localhost:5000`
+*   **특징**: Nginx 기반의 SPA 라우팅이 설정되어 있어 직접 URL 입력(Deep Link) 시에도 정상적으로 작동합니다.
