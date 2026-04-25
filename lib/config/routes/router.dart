@@ -17,9 +17,13 @@ import 'package:evangelical_gospel_partner/core/domain/entities/announcements.da
 
 import 'package:evangelical_gospel_partner/core/domain/entities/announcements.dart' as evt;
 
+import 'package:evangelical_gospel_partner/features/access_gate/presentation/pages/pending_approval_page.dart';
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateChangesProvider);
-  final accessControl = ref.watch(accessControlProvider);
+  // 상태 변화를 감시하여 라우터가 반응하도록 함
+  ref.watch(authStateChangesProvider);
+  ref.watch(currentUserProvider);
+  ref.watch(accessControlProvider);
 
   return GoRouter(
     initialLocation: '/login',
@@ -33,7 +37,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         return (isLoggingIn || isSigningUp) ? null : '/login';
       }
 
-      // 로그인된 경우, 게이트 상태 확인
+      // 로그인된 경우 사용자 정보 확인
+      final currentUser = ref.read(currentUserProvider).value;
+      
+      if (currentUser != null) {
+        // 1. 활성화 여부 확인 (미승인 사용자 차단)
+        if (!currentUser.isActive && state.matchedLocation != '/pending-approval') {
+          return '/pending-approval';
+        }
+        if (currentUser.isActive && state.matchedLocation == '/pending-approval') {
+          return '/home';
+        }
+      }
+
+      // 2. 게이트 상태 확인 (동시 접속자 제어)
       final gateState = ref.read(accessControlProvider).value;
       if (gateState != null && gateState.isBlocked && state.matchedLocation != '/gate') {
         return '/gate';
@@ -52,7 +69,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signup',
         builder: (context, state) => const SignupPage(),
       ),
-
+      GoRoute(
+        path: '/pending-approval',
+        builder: (context, state) => const PendingApprovalPage(),
+      ),
       GoRoute(
         path: '/tenant-select',
         builder: (context, state) => const TenantSelectPage(),
