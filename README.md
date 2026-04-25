@@ -65,3 +65,26 @@ docker ps
 ### 3. 접속 정보
 *   **URL**: `http://localhost:5000`
 *   **특징**: Nginx 기반의 SPA 라우팅이 설정되어 있어 직접 URL 입력(Deep Link) 시에도 정상적으로 작동합니다.
+
+---
+
+## 🚀 배포 및 업데이트 내역 (Antigravity)
+
+최근 보안 규칙 적용 및 배포 파이프라인(CI/CD) 구축 내역입니다. (2026.04)
+
+### 1. Web 앱 배포 완료 (GitHub Pages)
+- **데모 사이트 복구**: `actions/upload-artifact@v4`의 보안(SHA 고정) 정책 위반을 해결하기 위해 `peaceiris/actions-gh-pages`로 워크플로우를 전면 교체했습니다. (`.github/workflows/gh-pages.yml`)
+- **컴파일 오류 해결**: `auth_actions_provider.dart`, `home_page.dart`, `tenant_select_page.dart` 등에서 발생하던 웹 빌드 에러를 모두 수정했습니다.
+- **결과**: 현재 [데모 사이트](https://glory903-devsecops.github.io/evangelical-gospel-partner-platform/)에 정상적으로 Flutter 앱이 렌더링되고 있습니다.
+
+### 2. 보안 정책 강화 및 QA 절차 수립
+- **에이전트 행동 지침**: `97.Antigravity/QA_PROCEDURE.md`를 신규 생성하여, 향후 AI 에이전트들이 코드 푸시 전 반드시 린트 에러와 빌드를 확인하도록 의무화했습니다.
+
+### 3. 모바일(Android/iOS) 앱 배포 환경 구축
+- **Mac iOS 가이드**: `MAC_IOS_SETUP.md`를 생성하여 Mac 환경의 다른 에이전트나 개발자가 바로 `pod install` 및 Xcode 서명을 수행할 수 있도록 안내서를 작성했습니다.
+- **Android 자동 빌드 워크플로우**:
+  - `android-build.yml`: 메인 브랜치 푸시마다 테스트용 디버그 APK(`app-debug.apk`)를 자동 생성.
+  - `android-release.yml`: 구글 플레이 스토어 배포용 정식 App Bundle(`.aab`) 자동 생성.
+- **Android Release 트러블슈팅**:
+  - 구글 스토어용 릴리즈 빌드에 필요한 `key.properties` 참조 코드 중, Kotlin DSL 문법(`java.util.Properties` 패키지 참조 및 `it` 변수 참조 오류) 충돌 문제를 완전히 해결했습니다.
+  - GitHub CLI를 통해 직접 리포지토리 Secrets(`ANDROID_KEYSTORE_BASE64` 등)를 주입하여 자동화된 앱 배포 기반을 완성했습니다.
