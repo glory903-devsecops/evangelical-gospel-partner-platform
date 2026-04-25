@@ -13,6 +13,8 @@ class AppUser {
   final String tenantId;
   final UserRole role;
   final bool isActive;
+  final String? blockReason;
+  final DateTime? blockUntil;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -24,6 +26,8 @@ class AppUser {
     required this.tenantId,
     required this.role,
     required this.isActive,
+    this.blockReason,
+    this.blockUntil,
     required this.createdAt,
     required this.updatedAt,
   });

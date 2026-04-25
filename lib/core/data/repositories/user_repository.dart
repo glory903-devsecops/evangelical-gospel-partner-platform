@@ -26,4 +26,20 @@ class UserRepository extends BaseFirestoreRepository<AppUserModel> {
   Future<void> saveUser(AppUserModel user) async {
     await upsert(user.uid, user);
   }
+
+  /// 차단된 사용자 목록을 실시간으로 구독합니다.
+  Stream<List<AppUserModel>> watchBlockedUsers() {
+    return collection
+        .where('isActive', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => fromFirestore(doc)).toList());
+  }
+
+  /// 차단된 사용자 목록을 한 번 가져옵니다.
+  Future<List<AppUserModel>> getBlockedUsers() async {
+    final snapshot = await collection
+        .where('isActive', isEqualTo: false)
+        .get();
+    return snapshot.docs.map((doc) => fromFirestore(doc)).toList();
+  }
 }

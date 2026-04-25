@@ -13,6 +13,7 @@ import 'package:evangelical_gospel_partner/features/notices/presentation/pages/n
 import 'package:evangelical_gospel_partner/features/events/presentation/pages/event_detail_page.dart';
 import 'package:evangelical_gospel_partner/features/notices/presentation/pages/notice_editor_page.dart';
 import 'package:evangelical_gospel_partner/features/events/presentation/pages/event_editor_page.dart';
+import 'package:evangelical_gospel_partner/features/admin/presentation/pages/admin_dashboard_page.dart';
 import 'package:evangelical_gospel_partner/core/domain/entities/announcements.dart';
 
 import 'package:evangelical_gospel_partner/core/domain/entities/announcements.dart' as evt;
@@ -106,6 +107,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/event-edit',
         builder: (context, state) => const EventEditorPage(),
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const AdminDashboardPage(),
       ),
     ],
   );

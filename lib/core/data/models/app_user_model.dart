@@ -27,6 +27,10 @@ class AppUserModel extends AppUser {
         orElse: () => UserRole.user,
       ),
       isActive: data['isActive'] ?? false,
+      blockReason: data['blockReason'],
+      blockUntil: data['blockUntil'] != null 
+          ? (data['blockUntil'] as Timestamp).toDate() 
+          : null,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -40,8 +44,37 @@ class AppUserModel extends AppUser {
       'tenantId': tenantId,
       'role': role.name,
       'isActive': isActive,
+      'blockReason': blockReason,
+      'blockUntil': blockUntil != null ? Timestamp.fromDate(blockUntil!) : null,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
+  }
+
+  AppUserModel copyWith({
+    String? email,
+    String? name,
+    String? phone,
+    String? tenantId,
+    UserRole? role,
+    bool? isActive,
+    String? blockReason,
+    DateTime? blockUntil,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return AppUserModel(
+      uid: uid,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      tenantId: tenantId ?? this.tenantId,
+      role: role ?? this.role,
+      isActive: isActive ?? this.isActive,
+      blockReason: blockReason ?? this.blockReason,
+      blockUntil: blockUntil ?? this.blockUntil,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

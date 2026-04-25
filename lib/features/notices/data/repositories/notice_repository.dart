@@ -18,6 +18,7 @@ class NoticeRepository extends BaseFirestoreRepository<Notice> {
   }
 
   /// 고정된 공지사항을 우선으로 하여 최신순으로 가져옵니다.
+  /// 고정된 공지사항을 우선으로 하여 최신순으로 가져옵니다.
   Stream<List<Notice>> watchNotices(String tenantId) {
     return collection
         .where('tenantId', isEqualTo: tenantId)
@@ -25,5 +26,15 @@ class NoticeRepository extends BaseFirestoreRepository<Notice> {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => fromFirestore(doc)).toList());
+  }
+
+  /// 특정 사용자가 최근 N분 동안 작성한 공지사항 개수를 반환합니다.
+  Future<int> countRecentNotices(String userId, Duration duration) async {
+    final startTime = DateTime.now().subtract(duration);
+    final snapshot = await collection
+        .where('createdBy', isEqualTo: userId)
+        .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startTime))
+        .get();
+    return snapshot.size;
   }
 }

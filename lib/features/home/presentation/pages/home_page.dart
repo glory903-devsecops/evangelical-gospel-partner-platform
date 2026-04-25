@@ -9,6 +9,7 @@ import 'package:evangelical_gospel_partner/features/notices/presentation/provide
 import 'package:evangelical_gospel_partner/features/events/presentation/providers/event_providers.dart';
 import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -52,6 +53,66 @@ class _HomePageState extends ConsumerState<HomePage> {
         elevation: 0,
         centerTitle: false,
         shape: const Border(bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1)),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF1A535C), Color(0xFF4ECDC4)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: Color(0xFF1A535C)),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    ref.watch(currentUserProvider).value?.name ?? '사용자',
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    ref.watch(currentUserProvider).value?.email ?? '',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home_rounded),
+              title: const Text('홈'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _currentIndex = 0);
+              },
+            ),
+            if (ref.watch(currentUserProvider).value?.role == UserRole.admin)
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_rounded, color: Colors.blue),
+                title: const Text('운영자 패널', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/admin');
+                },
+              ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+              title: const Text('로그아웃', style: TextStyle(color: Colors.redAccent)),
+              onTap: () {
+                ref.read(authActionsProvider).signOut();
+              },
+            ),
+          ],
+        ),
       ),
       body: IndexedStack(
         index: _currentIndex,
