@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/data/repositories/tenant_repository.dart';
 import '../repositories/access_control_repository.dart';
 import '../repositories/user_repository.dart';
 import '../../../features/notices/data/repositories/notice_repository.dart';
@@ -45,6 +46,12 @@ final eventRepositoryProvider = Provider<EventRepository>((ref) {
 final eventApplicationRepositoryProvider = Provider<EventApplicationRepository>((ref) {
   final firestore = ref.watch(firestoreProvider);
   return EventApplicationRepository(firestore: firestore);
+});
+
+/// Tenant 관련 저장소 Provider
+final tenantRepositoryProvider = Provider<TenantRepository>((ref) {
+  final firestore = ref.watch(firestoreProvider);
+  return TenantRepository(firestore: firestore);
 });
 
 

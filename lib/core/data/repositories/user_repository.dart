@@ -42,4 +42,18 @@ class UserRepository extends BaseFirestoreRepository<AppUserModel> {
         .get();
     return snapshot.docs.map((doc) => fromFirestore(doc)).toList();
   }
+
+  /// 사용자의 정보를 특정 테넌트의 멤버 목록에 동기화합니다.
+  Future<void> syncToTenant(AppUserModel user, String tenantId) async {
+    final memberRef = firestore.collection('tenants').doc(tenantId).collection('members').doc(user.uid);
+    await memberRef.set({
+      'email': user.email,
+      'name': user.name,
+      'phone': user.phone,
+      'role': user.role.name,
+      'isActive': user.isActive,
+      'joinedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
 }

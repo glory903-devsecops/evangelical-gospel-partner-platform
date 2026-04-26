@@ -11,6 +11,7 @@ class AppUser {
   final String name;
   final String? phone;
   final String tenantId;
+  final List<String> joinedTenantIds;
   final UserRole role;
   final bool isActive;
   final String? blockReason;
@@ -24,6 +25,7 @@ class AppUser {
     required this.name,
     this.phone,
     required this.tenantId,
+    this.joinedTenantIds = const [],
     required this.role,
     required this.isActive,
     this.blockReason,

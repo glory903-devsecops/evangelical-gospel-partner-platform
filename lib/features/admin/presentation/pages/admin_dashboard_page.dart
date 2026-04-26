@@ -7,139 +7,193 @@ class AdminDashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final blockedUsersAsync = ref.watch(blockedUsersProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('운영자 패널', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          title: const Text('운영자 마스터 패널', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
           ),
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.people_alt_rounded), text: '사용자'),
+              Tab(icon: Icon(Icons.block_flipped), text: '블랙리스트'),
+              Tab(icon: Icon(Icons.campaign_rounded), text: '공지사항'),
+            ],
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorWeight: 3,
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            _UserManagementTab(),
+            _BlacklistTab(),
+            _NoticeManagementTab(),
+          ],
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-        ),
-        child: blockedUsersAsync.when(
-          data: (users) => users.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.verified_user_outlined, size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text('차단된 사용자가 없습니다.', style: TextStyle(color: Colors.grey, fontSize: 18)),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    final user = users[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                      shadowColor: Colors.black12,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.red[50],
-                                  child: Icon(Icons.person_off, color: Colors.red[700]),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                      Text(user.email, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red[50],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    '차단됨',
-                                    style: TextStyle(color: Colors.red[700], fontSize: 12, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(height: 24),
-                            const Text('차단 사유:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                            const SizedBox(height: 4),
-                            Text(user.blockReason ?? '사유 없음', style: const TextStyle(color: Colors.black87)),
-                            const SizedBox(height: 12),
-                            if (user.blockUntil != null) ...[
-                              Text(
-                                '차단 해제 예정: ${user.blockUntil!.toLocal().toString().split('.')[0]}',
-                                style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('차단 해제'),
-                                      content: Text('${user.name} 님의 차단을 해제하시겠습니까?'),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-                                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('확인')),
-                                      ],
-                                    ),
-                                  );
+    );
+  }
+}
 
-                                  if (confirm == true) {
-                                    await ref.read(adminActionsProvider).unblockUser(user);
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('사용자 차단이 해제되었습니다.')),
-                                      );
-                                    }
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF3B82F6),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: const Text('차단 해제 및 승인', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+class _UserManagementTab extends ConsumerWidget {
+  const _UserManagementTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final usersAsync = ref.watch(allUsersProvider);
+
+    return usersAsync.when(
+      data: (users) => ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          final user = users[index];
+          return Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: user.isActive ? Colors.blue[50] : Colors.red[50],
+                child: Icon(
+                  user.isActive ? Icons.person_rounded : Icons.person_off_rounded,
+                  color: user.isActive ? Colors.blue : Colors.red,
                 ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('에러 발생: $err')),
+              ),
+              title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('${user.email}\n지역: ${user.joinedTenantIds.join(", ")}'),
+              isThreeLine: true,
+              trailing: user.isActive 
+                ? IconButton(
+                    icon: const Icon(Icons.block, color: Colors.redAccent),
+                    onPressed: () => _showBlockDialog(context, ref, user),
+                  )
+                : const Icon(Icons.verified_user, color: Colors.grey),
+            ),
+          );
+        },
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('오류: $e')),
+    );
+  }
+
+  void _showBlockDialog(BuildContext context, WidgetRef ref, AppUserModel user) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${user.name} 차단'),
+        content: TextField(
+          controller: reasonController,
+          decoration: const InputDecoration(hintText: '차단 사유를 입력하세요'),
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () {
+              ref.read(adminActionsProvider).blockUser(user, reasonController.text);
+              Navigator.pop(context);
+            },
+            child: const Text('차단 확정', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BlacklistTab extends ConsumerWidget {
+  const _BlacklistTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final blockedUsersAsync = ref.watch(blockedUsersProvider);
+
+    return blockedUsersAsync.when(
+      data: (users) => users.isEmpty
+        ? const Center(child: Text('차단된 사용자가 없습니다.'))
+        : ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              final user = users[index];
+              return Card(
+                color: Colors.red[50],
+                child: ListTile(
+                  title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text('사유: ${user.blockReason ?? "없음"}'),
+                  trailing: TextButton(
+                    onPressed: () => ref.read(adminActionsProvider).unblockUser(user),
+                    child: const Text('차단 해제'),
+                  ),
+                ),
+              );
+            },
+          ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('오류: $e')),
+    );
+  }
+}
+
+class _NoticeManagementTab extends ConsumerWidget {
+  const _NoticeManagementTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noticesAsync = ref.watch(allNoticesGlobalProvider);
+
+    return noticesAsync.when(
+      data: (notices) => ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: notices.length,
+        itemBuilder: (context, index) {
+          final notice = notices[index];
+          return Card(
+            child: ListTile(
+              leading: const Icon(Icons.campaign, color: Colors.orange),
+              title: Text(notice.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: Text('테넌트: ${notice.tenantId}'),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () => _confirmDelete(context, ref, notice.id),
+              ),
+            ),
+          );
+        },
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('오류: $e')),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, String noticeId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('공지 삭제'),
+        content: const Text('이 공지사항을 영구적으로 삭제하시겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () {
+              ref.read(adminActionsProvider).deleteNotice(noticeId);
+              Navigator.pop(context);
+            },
+            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

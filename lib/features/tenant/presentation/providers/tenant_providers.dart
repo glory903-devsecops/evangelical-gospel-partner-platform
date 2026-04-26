@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:evangelical_gospel_partner/core/data/providers/firestore_providers.dart';
 import 'package:evangelical_gospel_partner/core/domain/entities/tenant.dart';
 

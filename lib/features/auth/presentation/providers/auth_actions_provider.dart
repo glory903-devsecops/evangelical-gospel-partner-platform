@@ -41,6 +41,7 @@ class AuthActions {
         email: email,
         name: name,
         tenantId: tenantId,
+        joinedTenantIds: [tenantId],
         role: UserRole.user,
         isActive: true,
         createdAt: DateTime.now(),
@@ -48,6 +49,9 @@ class AuthActions {
       );
 
       await _userRepository.saveUser(appUser);
+      
+      // 3. 지역별 독립 테이블(members)에 동기화
+      await _userRepository.syncToTenant(appUser, tenantId);
       
       // 사용자 표시 이름 업데이트 (옵션)
       await user.updateDisplayName(name);
@@ -74,21 +78,35 @@ class AuthActions {
       if (user == null) return;
 
       // Firestore에서 기존 사용자 확인
-      final existingUser = await _userRepository.getUser(user.uid);
+      final dynamic existingUser = await _userRepository.getUser(user.uid);
+      final targetTenantId = tenantId ?? 'anguk';
       
       if (existingUser == null) {
-        // 신규 유저인 경우 기본 지역(안국) 혹은 선택된 지역으로 가입
+        // 신규 유저인 경우
         final appUser = AppUserModel(
           uid: user.uid,
           email: user.email ?? '',
           name: user.displayName ?? '구글 사용자',
-          tenantId: tenantId ?? 'anguk', // 기본값 안국역
+          tenantId: targetTenantId,
+          joinedTenantIds: [targetTenantId],
           role: UserRole.user,
           isActive: true,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
         await _userRepository.saveUser(appUser);
+        await _userRepository.syncToTenant(appUser, targetTenantId);
+      } else {
+        // 기존 유저인 경우, 새로운 지역에 가입하는지 확인
+        final userModel = existingUser as AppUserModel;
+        if (!userModel.joinedTenantIds.contains(targetTenantId)) {
+          final updatedUser = userModel.copyWith(
+            joinedTenantIds: [...userModel.joinedTenantIds, targetTenantId],
+            tenantId: targetTenantId, // 현재 활성 지역 변경
+          );
+          await _userRepository.saveUser(updatedUser);
+          await _userRepository.syncToTenant(updatedUser, targetTenantId);
+        }
       }
     } catch (e) {
       rethrow;
