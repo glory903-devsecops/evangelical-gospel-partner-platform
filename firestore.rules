@@ -41,5 +41,10 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+    // 테넌트(Tenants) 컬렉션 규칙
+    match /tenants/{tenantId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
   }
 }

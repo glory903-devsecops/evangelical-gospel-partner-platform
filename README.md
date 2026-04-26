@@ -42,6 +42,24 @@
 
 ---
 
+## 🔒 보안 및 환경 설정 (Security & Environment Setup)
+
+본 프로젝트는 보안을 위해 민감한 정보를 공개 저장소(GitHub)에 포함하지 않습니다. 새로운 환경에서 프로젝트를 실행하려면 다음 설정이 필요합니다.
+
+### 1. 민감 정보 관리 (Secrets)
+*   **`.gitignore` 보호**: `99.Secrets/` 폴더와 `*.jks`, `key.properties` 파일은 버전 관리에서 제외됩니다.
+*   **로컬 설정**: 프로젝트 루트에 `99.Secrets/` 폴더를 생성하고, `SECURITY_CREDENTIALS.md` 파일을 만들어 API 키, 키스토어 비밀번호 등을 기록해 두는 것을 권장합니다.
+
+### 2. Firebase 설정
+*   **`lib/firebase_options.dart`**: 이 파일은 파이어베이스 설정 정보(API Key, App ID 등)를 포함합니다. 깃허브에 공유되어도 되지만, 구글 클라우드 콘솔에서 **API 키 제한(HTTP referrers, Android App restrictions)**을 반드시 설정해야 어뷰징을 방지할 수 있습니다.
+*   **Google Sign-in**: 구글 로그인을 위해 Firebase Console의 'Authentication' 메뉴에서 Google을 활성화하고, OAuth 클라이언트 ID를 확인하세요.
+
+### 3. Android 배포를 위한 키 생성
+*   릴리즈 빌드를 위해서는 `upload-keystore.jks` 파일이 필요합니다. 
+*   `android/key.properties` 파일을 생성하여 키스토어 경로와 비밀번호를 로컬에서 관리하세요. (예시 코드는 `android/app/build.gradle` 참조)
+
+---
+
 ## 로컬 실행 가이드 (Docker)
 
 본 프로젝트는 일관된 개발/테스트 환경을 위해 Docker 컨테이너 기반으로 구동됩니다.

@@ -61,7 +61,7 @@ class AuthActions {
   Future<void> signInWithGoogle({String? tenantId}) async {
     try {
       final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // 사용자가 취소함
+      if (googleUser == null) return;
 
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -77,12 +77,12 @@ class AuthActions {
       final existingUser = await _userRepository.getUser(user.uid);
       
       if (existingUser == null) {
-        // 신규 유저인 경우 프로필 생성
+        // 신규 유저인 경우 기본 지역(안국) 혹은 선택된 지역으로 가입
         final appUser = AppUserModel(
           uid: user.uid,
           email: user.email ?? '',
           name: user.displayName ?? '구글 사용자',
-          tenantId: tenantId ?? 'unknown', // 기본값 혹은 전달받은 값
+          tenantId: tenantId ?? 'anguk', // 기본값 안국역
           role: UserRole.user,
           isActive: true,
           createdAt: DateTime.now(),

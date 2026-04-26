@@ -7,6 +7,8 @@ class Tenant {
   final int maxConcurrentUsers;
   final int currentActiveUsers;
   final bool gateEnabled; // 접속 게이트 활성화 여부
+  final String primaryColor; // 메인 브랜드 색상 (Hex 코드)
+  final String brandImageUrl; // 브랜드 대표 이미지 URL
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -18,6 +20,8 @@ class Tenant {
     required this.maxConcurrentUsers,
     required this.currentActiveUsers,
     required this.gateEnabled,
+    required this.primaryColor,
+    required this.brandImageUrl,
     required this.createdAt,
     required this.updatedAt,
   });

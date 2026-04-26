@@ -85,12 +85,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 children: [
                   const Text(
                     '회원가입',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: -1.0,
-                    ),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -1.0),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -112,6 +107,39 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Social Login First
+                          SizedBox(
+                            width: double.infinity,
+                            height: 60,
+                            child: OutlinedButton.icon(
+                              onPressed: _isLoading ? null : () async {
+                                setState(() => _isLoading = true);
+                                try {
+                                  await ref.read(authActionsProvider).signInWithGoogle(tenantId: _selectedTenant);
+                                } catch (e) {
+                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('구글 가입 실패: $e')));
+                                } finally {
+                                  if (mounted) setState(() => _isLoading = false);
+                                }
+                              },
+                              icon: Image.network('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg', height: 24),
+                              label: const Text('Google로 시작하기', style: TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600)),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          const Row(
+                            children: [
+                              Expanded(child: Divider()),
+                              Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('또는 이메일로 가입', style: TextStyle(color: Colors.grey, fontSize: 13))),
+                              Expanded(child: Divider()),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
                           _buildFormField(
                             controller: _nameController,
                             label: '이름',
@@ -136,13 +164,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           ),
                           const SizedBox(height: 24),
                           
-                          const Text('소속 지역(교회) 선택', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1A535C))),
+                          const Text('활동 지역 선택', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1A535C))),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             value: _selectedTenant,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.grey.shade50,
+                              prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF1A535C)),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                             ),
@@ -169,30 +198,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                               child: _isLoading 
                                 ? const CircularProgressIndicator(color: Colors.white)
                                 : const Text('가입 완료', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          
-                          SizedBox(
-                            width: double.infinity,
-                            height: 60,
-                            child: OutlinedButton.icon(
-                              onPressed: _isLoading ? null : () async {
-                                setState(() => _isLoading = true);
-                                try {
-                                  await ref.read(authActionsProvider).signInWithGoogle(tenantId: _selectedTenant);
-                                } catch (e) {
-                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('구글 가입 실패: $e')));
-                                } finally {
-                                  if (mounted) setState(() => _isLoading = false);
-                                }
-                              },
-                              icon: Image.network('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg', height: 24),
-                              label: const Text('Google로 시작하기', style: TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600)),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Colors.grey.shade300),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              ),
                             ),
                           ),
                         ],

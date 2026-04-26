@@ -10,6 +10,8 @@ class TenantModel extends Tenant {
     required super.maxConcurrentUsers,
     required super.currentActiveUsers,
     required super.gateEnabled,
+    required super.primaryColor,
+    required super.brandImageUrl,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -24,6 +26,8 @@ class TenantModel extends Tenant {
       maxConcurrentUsers: data['maxConcurrentUsers'] ?? 0,
       currentActiveUsers: data['currentActiveUsers'] ?? 0,
       gateEnabled: data['gateEnabled'] ?? false,
+      primaryColor: data['primaryColor'] ?? '#1A535C',
+      brandImageUrl: data['brandImageUrl'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
@@ -37,6 +41,8 @@ class TenantModel extends Tenant {
       'maxConcurrentUsers': maxConcurrentUsers,
       'currentActiveUsers': currentActiveUsers,
       'gateEnabled': gateEnabled,
+      'primaryColor': primaryColor,
+      'brandImageUrl': brandImageUrl,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
