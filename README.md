@@ -27,19 +27,19 @@
 전도 파트너 플랫폼의 핵심 사용자 여정을 단계별로 안내합니다.
 
 ### 1. 시작 및 로그인 (Landing & Login)
-![시작 화면](file:///C:/Users/LG-GLORY/.gemini/antigravity/brain/e48e6a05-ab45-41e5-9ac3-990088ccd4f8/01_landing_page_1777217056747.png)
+![시작 화면](docs/screenshots/01_landing_page.png)
 *   **Google로 시작하기**: 별도의 복잡한 가입 절차 없이 구글 계정으로 즉시 시작할 수 있습니다.
 
 ### 2. 지역 선택 및 회원가입 (Signup & Region Selection)
-![회원가입 화면](file:///C:/Users/LG-GLORY/.gemini/antigravity/brain/e48e6a05-ab45-41e5-9ac3-990088ccd4f8/02_signup_page_1777217063389.png)
+![회원가입 화면](docs/screenshots/02_signup_page.png)
 *   **소속 선택**: 가입 시 본인이 활동할 지역(테넌트)을 선택합니다. 선택한 지역에 따라 앱의 테마 색상과 로고가 자동으로 설정됩니다.
 
 ### 3. 홈 화면 및 지역별 브랜딩 (Dynamic Branding)
-![안국역 테마](file:///C:/Users/LG-GLORY/.gemini/antigravity/brain/e48e6a05-ab45-41e5-9ac3-990088ccd4f8/03_home_ankuk_1777217158920.png)
+![안국역 테마](docs/screenshots/03_home_ankuk.png)
 *   **안국역 파트너**: 3호선의 주황색 테마와 역명판 스타일의 상단 이미지가 적용된 모습입니다.
 
 ### 4. 당근 스타일 지역 전환 (Region Switcher)
-![지역 전환 팝업](file:///C:/Users/LG-GLORY/.gemini/antigravity/brain/e48e6a05-ab45-41e5-9ac3-990088ccd4f8/04_region_switcher_1777217399711.png)
+![지역 전환 팝업](docs/screenshots/04_region_switcher.png)
 *   **간편한 전환**: 상단 왼쪽의 지역명을 클릭하면 하단 시트가 나타나며, 다른 지역의 소식을 궁금해할 때 언제든 간편하게 이동할 수 있습니다.
 
 ---

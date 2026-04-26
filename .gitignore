@@ -46,6 +46,12 @@ app.*.map.json
 
 # Security & Secrets (Local only)
 99.Secrets/
+98.Accounts/
 *.jks
 *.keystore
 key.properties
+*accounts*
+*table*
+*계정*
+private/
+**/*.private.*
