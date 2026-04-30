@@ -32,19 +32,51 @@ class EvangelicalGospelApp extends ConsumerWidget {
     ref.watch(sessionCheckProvider);
     
     final router = ref.watch(routerProvider);
+    final authInit = ref.watch(currentUserProvider);
 
-    return MaterialApp.router(
-      title: '전도 파트너 플랫폼',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1A535C), // 신뢰감을 주는 딥 그린
-          brightness: Brightness.light,
+    return authInit.when(
+      data: (user) => MaterialApp.router(
+        title: '전도 파트너 플랫폼',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF1A535C),
+            brightness: Brightness.light,
+          ),
+          textTheme: GoogleFonts.notoSansKrTextTheme(),
         ),
-        textTheme: GoogleFonts.notoSansKrTextTheme(),
+        routerConfig: router,
       ),
-      routerConfig: router,
+      loading: () => const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (err, stack) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text('앱 초기화 오류: $err', textAlign: TextAlign.center),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.read(authActionsProvider).logout(),
+                  child: const Text('다시 로그인 시도'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

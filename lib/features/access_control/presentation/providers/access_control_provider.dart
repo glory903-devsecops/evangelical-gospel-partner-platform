@@ -23,7 +23,6 @@ final accessControlProvider = StreamProvider<AccessControlState>((ref) {
 
   return repository.watchTenantStatus(tenantId).map((model) {
     if (model == null) {
-      // 문서가 없는 경우 초기 상태 반환
       return AccessControlState(
         tenantId: tenantId,
         currentUsers: 0,
@@ -33,6 +32,15 @@ final accessControlProvider = StreamProvider<AccessControlState>((ref) {
       );
     }
     return model;
+  }).handleError((error) {
+    print('Access Control Error: $error');
+    return AccessControlState(
+      tenantId: tenantId,
+      currentUsers: 0,
+      maxUsers: 100,
+      isGateEnabled: false,
+      updatedAt: DateTime.now(),
+    );
   });
 });
 
