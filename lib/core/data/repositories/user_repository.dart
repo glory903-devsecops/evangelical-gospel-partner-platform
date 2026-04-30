@@ -52,7 +52,7 @@ class UserRepository extends BaseFirestoreRepository<AppUserModel> {
         .get();
     
     if (snapshot.docs.isEmpty) return null;
-    return snapshot.docs.first.data().email;
+    return fromFirestore(snapshot.docs.first).email;
   }
 
   /// 사용자의 정보를 특정 테넌트의 멤버 목록에 동기화합니다.

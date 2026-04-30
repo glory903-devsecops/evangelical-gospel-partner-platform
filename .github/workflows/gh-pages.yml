@@ -25,6 +25,11 @@ jobs:
           export PATH="$PATH:$HOME/flutter/bin"
           flutter pub get
 
+      - name: Analyze
+        run: |
+          export PATH="$PATH:$HOME/flutter/bin"
+          flutter analyze --no-fatal-warnings
+
       - name: Build Web
         run: |
           export PATH="$PATH:$HOME/flutter/bin"

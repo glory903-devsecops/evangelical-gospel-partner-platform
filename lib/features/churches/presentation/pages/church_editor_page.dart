@@ -45,7 +45,7 @@ class _ChurchEditorPageState extends ConsumerState<ChurchEditorPage> {
       final tenantId = ref.read(currentTenantIdProvider);
       final church = ChurchModel(
         id: '', // Firestore will generate
-        tenantId: tenantId,
+        tenantId: tenantId ?? '',
         name: _nameController.text,
         denomination: _denominationController.text,
         pastorName: _pastorController.text,

@@ -271,7 +271,7 @@ class _HomeSummaryView extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                _buildQuickActions(primaryColor),
+                _buildQuickActions(context, primaryColor),
                 const SizedBox(height: 32),
                 _buildSectionHeader('최신 공지사항', primaryColor, () => onTabChange(2)),
                 const SizedBox(height: 16),
@@ -412,7 +412,7 @@ class _HomeSummaryView extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActions(Color primaryColor) {
+  Widget _buildQuickActions(BuildContext context, Color primaryColor) {
     return Row(
       children: [
         _ActionItem(
@@ -461,20 +461,21 @@ class _ActionItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 24),
           decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: color.withOpacity(0.1), width: 1),
           ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withOpacity(0.1), width: 1),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 10),
-            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 14)),
-          ],
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 32),
+              const SizedBox(height: 10),
+              Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 14)),
+            ],
+          ),
         ),
       ),
     );

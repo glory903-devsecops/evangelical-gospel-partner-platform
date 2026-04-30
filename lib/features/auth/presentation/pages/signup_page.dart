@@ -239,6 +239,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     required String label,
     required IconData icon,
     TextInputType? keyboardType,
+    String? hint,
     bool isPassword = false,
     String? Function(String?)? validator,
   }) {
@@ -253,6 +254,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           keyboardType: keyboardType,
           validator: validator,
           decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
             prefixIcon: Icon(icon, color: const Color(0xFF1A535C).withOpacity(0.5)),
             filled: true,
             fillColor: Colors.grey.shade50,

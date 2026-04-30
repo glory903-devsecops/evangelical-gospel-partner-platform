@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../domain/entities/church.dart';
+import 'package:evangelical_gospel_partner/features/churches/domain/entities/church.dart';
 
 class ChurchModel extends Church {
   ChurchModel({

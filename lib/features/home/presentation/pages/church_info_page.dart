@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/church_providers.dart';
-import '../../../../core/services/map_service.dart';
+import 'package:evangelical_gospel_partner/features/churches/presentation/providers/church_providers.dart';
+import 'package:evangelical_gospel_partner/core/services/map_service.dart';
 
 class ChurchInfoPage extends ConsumerWidget {
   const ChurchInfoPage({super.key});
@@ -120,7 +120,7 @@ class ChurchInfoPage extends ConsumerWidget {
 
   Widget _buildChurchCard(BuildContext context, dynamic church) {
     return Container(
-      margin: const EdgeInsets.bottom(16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),

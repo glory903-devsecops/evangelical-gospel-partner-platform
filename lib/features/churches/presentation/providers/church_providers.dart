@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/models/church_model.dart';
-import '../data/repositories/church_repository.dart';
-import '../../../tenant/presentation/providers/tenant_providers.dart';
+import 'package:evangelical_gospel_partner/features/churches/data/models/church_model.dart';
+import 'package:evangelical_gospel_partner/features/churches/data/repositories/church_repository.dart';
+import 'package:evangelical_gospel_partner/features/tenant/presentation/providers/tenant_providers.dart';
 
 final churchRepositoryProvider = Provider((ref) => ChurchRepository());
 
 final churchesStreamProvider = StreamProvider<List<ChurchModel>>((ref) {
   final tenantId = ref.watch(currentTenantIdProvider);
-  return ref.watch(churchRepositoryProvider).getChurchesByTenant(tenantId);
+  return ref.watch(churchRepositoryProvider).getChurchesByTenant(tenantId ?? '');
 });
 
 final churchSearchQueryProvider = StateProvider<String>((ref) => '');
@@ -22,13 +22,13 @@ final filteredChurchesProvider = Provider<List<ChurchModel>>((ref) {
 
   return churchesAsync.when(
     data: (churches) {
-      final filtered = churches.where((c) {
+      final filtered = churches.where((ChurchModel c) {
         return c.name.toLowerCase().contains(query) ||
                c.denomination.toLowerCase().contains(query) ||
                c.pastorName.toLowerCase().contains(query);
       }).toList();
 
-      filtered.sort((a, b) {
+      filtered.sort((ChurchModel a, ChurchModel b) {
         int result = 0;
         switch (sortColumn) {
           case 'name':
