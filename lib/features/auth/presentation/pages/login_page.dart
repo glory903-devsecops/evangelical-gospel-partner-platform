@@ -161,6 +161,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () => _showFindEmailDialog(context, ref),
+                              child: Text('아이디 찾기', style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                            ),
+                            Container(width: 1, height: 12, color: Colors.grey.shade300),
+                            TextButton(
+                              onPressed: () => _showResetPasswordDialog(context, ref),
+                              child: Text('비밀번호 재설정', style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -216,6 +231,187 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showFindEmailDialog(BuildContext context, WidgetRef ref) {
+    final nameController = TextEditingController();
+    final birthDateController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('아이디(이메일) 찾기'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '⚠️ 구글 계정으로 로그인한 경우 가입 정보가 없다고 표시됩니다.',
+              style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(hintText: '이름'),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: birthDateController,
+              decoration: const InputDecoration(hintText: '생년월일 6자리 (예: 900101)'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () async {
+              final email = await ref.read(authActionsProvider).findEmail(
+                name: nameController.text.trim(),
+                birthDate: birthDateController.text.trim(),
+              );
+              if (context.mounted) {
+                Navigator.pop(context);
+                if (email != null) {
+                  _showFindResultDialog(context, email);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('일치하는 계정 정보가 없습니다.')),
+                  );
+                }
+              }
+            },
+            child: const Text('찾기'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFindResultDialog(BuildContext context, String email) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('아이디 찾기 결과'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('찾으시는 아이디는 다음과 같습니다.'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                email,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A535C)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showResetPasswordDialog(context, ref);
+            },
+            child: const Text('비밀번호 찾기(재설정)'),
+          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('닫기')),
+        ],
+      ),
+    );
+  }
+
+  void _showResetPasswordDialog(BuildContext context, WidgetRef ref) {
+    final emailController = TextEditingController();
+    final nameController = TextEditingController();
+    final birthDateController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    
+    bool isVerified = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(isVerified ? '새 비밀번호 설정' : '계정 정보 확인'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!isVerified) ...[
+                  const Text('아이디, 이름, 생년월일을 모두 입력해 주세요.', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  const SizedBox(height: 16),
+                  TextField(controller: emailController, decoration: const InputDecoration(hintText: '아이디 (이메일)')),
+                  const SizedBox(height: 8),
+                  TextField(controller: nameController, decoration: const InputDecoration(hintText: '이름')),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: birthDateController, 
+                    decoration: const InputDecoration(hintText: '생년월일 6자리'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ] else ...[
+                  const Text('본인 확인이 완료되었습니다.\n새로운 비밀번호를 입력해 주세요.', style: TextStyle(fontSize: 13, color: Color(0xFF1A535C))),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: newPasswordController, 
+                    decoration: const InputDecoration(hintText: '새 비밀번호 (6자 이상)'),
+                    obscureText: true,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+            if (!isVerified)
+              TextButton(
+                onPressed: () async {
+                  // 1단계: 정보 일치 확인 (아이디 찾기 로직 재사용)
+                  final foundEmail = await ref.read(authActionsProvider).findEmail(
+                    name: nameController.text.trim(),
+                    birthDate: birthDateController.text.trim(),
+                  );
+                  
+                  if (foundEmail == emailController.text.trim()) {
+                    setState(() => isVerified = true);
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('입력하신 정보가 일치하지 않습니다.')));
+                    }
+                  }
+                },
+                child: const Text('다음'),
+              )
+            else
+              TextButton(
+                onPressed: () async {
+                  // 2단계: 백엔드 함수 호출하여 비밀번호 변경
+                  try {
+                    await ref.read(authActionsProvider).resetPasswordDirectly(
+                      email: emailController.text.trim(),
+                      name: nameController.text.trim(),
+                      birthDate: birthDateController.text.trim(),
+                      newPassword: newPasswordController.text.trim(),
+                    );
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('비밀번호가 성공적으로 변경되었습니다.')));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('변경 실패: $e')));
+                    }
+                  }
+                },
+                child: const Text('변경 완료'),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

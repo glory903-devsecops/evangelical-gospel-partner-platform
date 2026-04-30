@@ -7,6 +7,7 @@ class AppUserModel extends AppUser {
     required super.email,
     required super.name,
     super.phone,
+    super.birthDate,
     required super.tenantId,
     super.joinedTenantIds = const [],
     required super.role,
@@ -24,6 +25,7 @@ class AppUserModel extends AppUser {
       email: data['email'] ?? '',
       name: data['name'] ?? '',
       phone: data['phone'],
+      birthDate: data['birthDate'],
       tenantId: data['tenantId'] ?? '',
       joinedTenantIds: List<String>.from(data['joinedTenantIds'] ?? []),
       role: UserRole.values.firstWhere(
@@ -45,6 +47,7 @@ class AppUserModel extends AppUser {
       'email': email,
       'name': name,
       'phone': phone,
+      'birthDate': birthDate,
       'tenantId': tenantId,
       'joinedTenantIds': joinedTenantIds,
       'role': role.name,
@@ -57,9 +60,11 @@ class AppUserModel extends AppUser {
   }
 
   AppUserModel copyWith({
+    String? uid,
     String? email,
     String? name,
     String? phone,
+    String? birthDate,
     String? tenantId,
     UserRole? role,
     bool? isActive,
@@ -70,10 +75,11 @@ class AppUserModel extends AppUser {
     DateTime? updatedAt,
   }) {
     return AppUserModel(
-      uid: uid,
+      uid: uid ?? this.uid,
       email: email ?? this.email,
       name: name ?? this.name,
       phone: phone ?? this.phone,
+      birthDate: birthDate ?? this.birthDate,
       tenantId: tenantId ?? this.tenantId,
       role: role ?? this.role,
       isActive: isActive ?? this.isActive,

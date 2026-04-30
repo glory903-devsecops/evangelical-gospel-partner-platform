@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'config/routes/router.dart';
 import 'features/auth/presentation/providers/auth_providers.dart';
+import 'core/services/session_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +27,9 @@ class EvangelicalGospelApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 테넌트 동기화 로직 활성화
+    // 테넌트 동기화 및 세션 체크 로직 활성화
     ref.watch(authInitializationProvider);
+    ref.watch(sessionCheckProvider);
     
     final router = ref.watch(routerProvider);
 

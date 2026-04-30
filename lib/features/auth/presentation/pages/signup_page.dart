@@ -15,6 +15,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _birthDateController = TextEditingController(); // 생년월일 추가
   
   String _selectedTenant = 'anguk';
   bool _isLoading = false;
@@ -31,6 +32,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _birthDateController.dispose();
     super.dispose();
   }
 
@@ -43,6 +45,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        birthDate: _birthDateController.text.trim(),
         tenantId: _selectedTenant,
       );
       
@@ -153,6 +156,15 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                             icon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                             validator: (v) => (v == null || !v.contains('@')) ? '올바른 이메일을 입력해 주세요' : null,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildFormField(
+                            controller: _birthDateController,
+                            label: '생년월일 (6자리)',
+                            icon: Icons.calendar_today_outlined,
+                            hint: '예: 900101',
+                            keyboardType: TextInputType.number,
+                            validator: (v) => (v == null || v.length != 6) ? '6자리 숫자로 입력해 주세요' : null,
                           ),
                           const SizedBox(height: 16),
                           _buildFormField(

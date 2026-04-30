@@ -3,6 +3,9 @@ import 'package:evangelical_gospel_partner/core/data/providers/firestore_provide
 import 'package:evangelical_gospel_partner/features/tenant/presentation/providers/tenant_providers.dart';
 import 'package:evangelical_gospel_partner/core/data/models/announcements_models.dart';
 import 'package:evangelical_gospel_partner/core/data/providers/firestore_providers.dart' as auth_core;
+import 'package:evangelical_gospel_partner/features/notices/data/repositories/notice_repository.dart';
+import 'package:evangelical_gospel_partner/core/data/repositories/user_repository.dart';
+import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final noticeActionsProvider = Provider((ref) {
@@ -41,7 +44,7 @@ class NoticeActions {
       // 24시간 차단 처리
       final user = await userRepository.getById(userId!);
       if (user != null) {
-        final blockedUser = (user as AppUserModel).copyWith(
+        final blockedUser = user.copyWith(
           isActive: false, // isActive를 false로 하여 접근 차단
           blockReason: '공지사항 무단배포 (어뷰징 감지)',
           blockUntil: DateTime.now().add(const Duration(hours: 24)),
@@ -63,5 +66,9 @@ class NoticeActions {
     );
 
     await repository.add(notice);
+  }
+
+  Future<void> deleteNotice(String noticeId) async {
+    await repository.delete(noticeId);
   }
 }

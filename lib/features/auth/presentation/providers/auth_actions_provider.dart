@@ -4,25 +4,30 @@ import 'package:evangelical_gospel_partner/core/data/models/app_user_model.dart'
 import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:evangelical_gospel_partner/core/services/session_service.dart';
 
 final authActionsProvider = Provider((ref) {
   final auth = ref.watch(firebaseAuthProvider);
   final userRepository = ref.watch(userRepositoryProvider);
+  final sessionService = ref.watch(sessionServiceProvider);
   
-  return AuthActions(auth, userRepository);
+  return AuthActions(auth, userRepository, sessionService);
 });
 
 class AuthActions {
   final FirebaseAuth _auth;
   final dynamic _userRepository;
+  final dynamic _sessionService;
 
-  AuthActions(this._auth, this._userRepository);
+  AuthActions(this._auth, this._userRepository, this._sessionService);
 
   /// 새로운 사용자를 등록합니다.
   Future<void> signUp({
-    required String name,
     required String email,
     required String password,
+    required String name,
+    required String birthDate,
     required String tenantId,
   }) async {
     try {
@@ -40,6 +45,7 @@ class AuthActions {
         uid: user.uid,
         email: email,
         name: name,
+        birthDate: birthDate,
         tenantId: tenantId,
         joinedTenantIds: [tenantId],
         role: UserRole.user,
@@ -55,6 +61,9 @@ class AuthActions {
       
       // 사용자 표시 이름 업데이트 (옵션)
       await user.updateDisplayName(name);
+      
+      // 세션 시작 기록
+      await _sessionService.recordLogin();
       
     } catch (e) {
       rethrow;
@@ -108,6 +117,8 @@ class AuthActions {
           await _userRepository.syncToTenant(updatedUser, targetTenantId);
         }
       }
+      // 세션 시작 기록
+      await _sessionService.recordLogin();
     } catch (e) {
       rethrow;
     }
@@ -116,11 +127,40 @@ class AuthActions {
   /// 기존 사용자로 로그인합니다.
   Future<void> login(String email, String password) async {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
+    await _sessionService.recordLogin();
   }
 
   /// 로그아웃합니다.
   Future<void> logout() async {
     await _auth.signOut();
     await GoogleSignIn().signOut();
+  }
+
+  /// 이메일(아이디) 찾기
+  Future<String?> findEmail({required String name, required String birthDate}) async {
+    return await _userRepository.findEmailByNameAndBirthDate(name, birthDate);
+  }
+
+  /// 비밀번호 재설정 이메일 발송
+  Future<void> sendPasswordReset(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  /// 이름/생년월일 기반 비밀번호 직접 재설정 (백엔드 함수 호출)
+  Future<void> resetPasswordDirectly({
+    required String email,
+    required String name,
+    required String birthDate,
+    required String newPassword,
+  }) async {
+    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3') // 한국 리전 권장
+        .httpsCallable('resetPasswordWithMetadata');
+    
+    await callable.call({
+      'email': email,
+      'name': name,
+      'birthDate': birthDate,
+      'newPassword': newPassword,
+    });
   }
 }

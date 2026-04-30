@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
+import 'package:evangelical_gospel_partner/core/data/models/app_user_model.dart';
+import 'package:evangelical_gospel_partner/core/domain/entities/tenant.dart';
 import '../providers/admin_providers.dart';
 
 class AdminDashboardPage extends ConsumerWidget {
@@ -8,7 +11,7 @@ class AdminDashboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
@@ -24,10 +27,12 @@ class AdminDashboardPage extends ConsumerWidget {
             ),
           ),
           bottom: const TabBar(
+            isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.people_alt_rounded), text: '사용자'),
               Tab(icon: Icon(Icons.block_flipped), text: '블랙리스트'),
               Tab(icon: Icon(Icons.campaign_rounded), text: '공지사항'),
+              Tab(icon: Icon(Icons.settings_suggest_rounded), text: '테넌트 설정'),
             ],
             indicatorColor: Colors.white,
             labelColor: Colors.white,
@@ -40,6 +45,7 @@ class AdminDashboardPage extends ConsumerWidget {
             _UserManagementTab(),
             _BlacklistTab(),
             _NoticeManagementTab(),
+            _TenantSettingsTab(),
           ],
         ),
       ),
@@ -71,20 +77,55 @@ class _UserManagementTab extends ConsumerWidget {
                 ),
               ),
               title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${user.email}\n지역: ${user.joinedTenantIds.join(", ")}'),
+              subtitle: Text('${user.email}\n역할: ${user.role.name.toUpperCase()} / 지역: ${user.joinedTenantIds.join(", ")}'),
               isThreeLine: true,
-              trailing: user.isActive 
-                ? IconButton(
-                    icon: const Icon(Icons.block, color: Colors.redAccent),
-                    onPressed: () => _showBlockDialog(context, ref, user),
-                  )
-                : const Icon(Icons.verified_user, color: Colors.grey),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.admin_panel_settings_outlined, color: Colors.blueGrey),
+                    onPressed: () => _showRoleDialog(context, ref, user),
+                    tooltip: '권한 변경',
+                  ),
+                  if (user.isActive)
+                    IconButton(
+                      icon: const Icon(Icons.block, color: Colors.redAccent),
+                      onPressed: () => _showBlockDialog(context, ref, user),
+                      tooltip: '차단',
+                    ),
+                ],
+              ),
             ),
           );
         },
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('오류: $e')),
+    );
+  }
+
+  void _showRoleDialog(BuildContext context, WidgetRef ref, AppUserModel user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${user.name} 권한 변경'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: UserRole.values.map((role) {
+            return RadioListTile<UserRole>(
+              title: Text(role.name.toUpperCase()),
+              value: role,
+              groupValue: user.role,
+              onChanged: (newRole) {
+                if (newRole != null) {
+                  ref.read(adminActionsProvider).updateUserRole(user, newRole);
+                  Navigator.pop(context);
+                }
+              },
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -192,6 +233,97 @@ class _NoticeManagementTab extends ConsumerWidget {
               Navigator.pop(context);
             },
             child: const Text('삭제', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TenantSettingsTab extends ConsumerWidget {
+  const _TenantSettingsTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tenantsAsync = ref.watch(adminAllTenantsProvider);
+
+    return tenantsAsync.when(
+      data: (tenants) => ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: tenants.length,
+        itemBuilder: (context, index) {
+          final tenant = tenants[index];
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(tenant.displayName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Chip(label: Text(tenant.id, style: const TextStyle(fontSize: 12))),
+                    ],
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: const Text('최대 동시 접속자 수'),
+                    subtitle: Text('${tenant.maxConcurrentUsers}명'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _showMaxUsersDialog(context, ref, tenant),
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text('접속 게이트 활성화'),
+                    subtitle: const Text('인원 초과 시 게이트 화면을 표시합니다.'),
+                    value: tenant.gateEnabled,
+                    onChanged: (val) {
+                      ref.read(adminActionsProvider).updateTenantSettings(
+                        tenantId: tenant.id,
+                        maxConcurrentUsers: tenant.maxConcurrentUsers,
+                        gateEnabled: val,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('오류: $e')),
+    );
+  }
+
+  void _showMaxUsersDialog(BuildContext context, WidgetRef ref, Tenant tenant) {
+    final controller = TextEditingController(text: tenant.maxConcurrentUsers.toString());
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${tenant.displayName} 상한 설정'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: '최대 접속자 수'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () {
+              final val = int.tryParse(controller.text);
+              if (val != null) {
+                ref.read(adminActionsProvider).updateTenantSettings(
+                  tenantId: tenant.id,
+                  maxConcurrentUsers: val,
+                  gateEnabled: tenant.gateEnabled,
+                );
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('저장'),
           ),
         ],
       ),

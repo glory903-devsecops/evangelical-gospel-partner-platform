@@ -19,6 +19,10 @@ import 'package:evangelical_gospel_partner/core/domain/entities/announcements.da
 import 'package:evangelical_gospel_partner/core/domain/entities/announcements.dart' as evt;
 
 import 'package:evangelical_gospel_partner/features/access_gate/presentation/pages/pending_approval_page.dart';
+import 'package:evangelical_gospel_partner/features/home/presentation/pages/church_info_page.dart';
+import 'package:evangelical_gospel_partner/features/home/presentation/pages/manual_page.dart';
+import 'package:evangelical_gospel_partner/features/home/presentation/pages/stats_page.dart';
+import 'package:evangelical_gospel_partner/features/churches/presentation/pages/church_editor_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // 상태 변화를 감시하여 라우터가 반응하도록 함
@@ -111,6 +115,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminDashboardPage(),
+      ),
+      GoRoute(
+        path: '/church-info',
+        builder: (context, state) => const ChurchInfoPage(),
+      ),
+      GoRoute(
+        path: '/manual',
+        builder: (context, state) => const ManualPage(),
+      ),
+      GoRoute(
+        path: '/stats',
+        builder: (context, state) => const StatsPage(),
+      ),
+      GoRoute(
+        path: '/church-edit',
+        builder: (context, state) => const ChurchEditorPage(),
       ),
     ],
   );

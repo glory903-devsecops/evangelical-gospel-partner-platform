@@ -8,6 +8,7 @@ import 'package:evangelical_gospel_partner/features/tenant/presentation/provider
 import 'package:evangelical_gospel_partner/features/notices/presentation/providers/notice_providers.dart';
 import 'package:evangelical_gospel_partner/features/events/presentation/providers/event_providers.dart';
 import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_providers.dart';
+import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_actions_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
 import 'package:intl/intl.dart';
@@ -125,7 +126,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           IconButton(
             icon: const Icon(Icons.logout_rounded, size: 24, color: Colors.redAccent),
-            onPressed: () => ref.read(authActionsProvider).signOut(),
+            onPressed: () => ref.read(authActionsProvider).logout(),
             tooltip: '로그아웃',
           ),
           const SizedBox(width: 8),
@@ -190,7 +191,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               leading: const Icon(Icons.logout_rounded, color: Colors.redAccent),
               title: const Text('로그아웃', style: TextStyle(color: Colors.redAccent)),
               onTap: () {
-                ref.read(authActionsProvider).signOut();
+                ref.read(authActionsProvider).logout();
               },
             ),
           ],
@@ -235,6 +236,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
 class _HomeSummaryView extends ConsumerWidget {
   final Function(int) onTabChange;
+
+  const _HomeSummaryView({required this.onTabChange});
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -412,11 +415,26 @@ class _HomeSummaryView extends ConsumerWidget {
   Widget _buildQuickActions(Color primaryColor) {
     return Row(
       children: [
-        _ActionItem(icon: Icons.qr_code_scanner_rounded, label: '출석체크', color: primaryColor),
+        _ActionItem(
+          icon: Icons.church_rounded, 
+          label: '교회 정보', 
+          color: primaryColor,
+          onTap: () => context.push('/church-info'),
+        ),
         const SizedBox(width: 12),
-        _ActionItem(icon: Icons.volunteer_activism_rounded, label: '헌금하기', color: const Color(0xFF4ECDC4)),
+        _ActionItem(
+          icon: Icons.menu_book_rounded, 
+          label: '전도 메뉴얼', 
+          color: const Color(0xFF4ECDC4),
+          onTap: () => context.push('/manual'),
+        ),
         const SizedBox(width: 12),
-        _ActionItem(icon: Icons.menu_book_rounded, label: '나눔터', color: const Color(0xFFFF6B6B)),
+        _ActionItem(
+          icon: Icons.analytics_rounded, 
+          label: '전도 현황', 
+          color: const Color(0xFFFF6B6B),
+          onTap: () => context.push('/stats'),
+        ),
       ],
     );
   }
@@ -426,15 +444,23 @@ class _ActionItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final VoidCallback onTap;
 
-  const _ActionItem({required this.icon, required this.label, required this.color});
+  const _ActionItem({
+    required this.icon, 
+    required this.label, 
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evangelical_gospel_partner/core/domain/entities/app_user.dart';
-import '../entities/tenant_member.dart';
+import '../../domain/entities/tenant_member.dart';
 
 class TenantMemberModel extends TenantMember {
   TenantMemberModel({
@@ -33,13 +33,13 @@ class TenantMemberModel extends TenantMember {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'email': email,
-      'name': name,
-      'phone': phone,
-      'role': role.name,
-      'isActive': isActive,
-      'joinedAt': Timestamp.fromDate(joinedAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
+      'email': this.email,
+      'name': this.name,
+      'phone': this.phone,
+      'role': this.role.name,
+      'isActive': this.isActive,
+      'joinedAt': Timestamp.fromDate(this.joinedAt),
+      'updatedAt': Timestamp.fromDate(this.updatedAt),
     };
   }
 }

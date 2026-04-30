@@ -43,6 +43,18 @@ class UserRepository extends BaseFirestoreRepository<AppUserModel> {
     return snapshot.docs.map((doc) => fromFirestore(doc)).toList();
   }
 
+  /// 이름과 생년월일로 사용자의 이메일을 찾습니다 (아이디 찾기 용도)
+  Future<String?> findEmailByNameAndBirthDate(String name, String birthDate) async {
+    final snapshot = await collection
+        .where('name', isEqualTo: name)
+        .where('birthDate', isEqualTo: birthDate)
+        .limit(1)
+        .get();
+    
+    if (snapshot.docs.isEmpty) return null;
+    return snapshot.docs.first.data().email;
+  }
+
   /// 사용자의 정보를 특정 테넌트의 멤버 목록에 동기화합니다.
   Future<void> syncToTenant(AppUserModel user, String tenantId) async {
     final memberRef = firestore.collection('tenants').doc(tenantId).collection('members').doc(user.uid);

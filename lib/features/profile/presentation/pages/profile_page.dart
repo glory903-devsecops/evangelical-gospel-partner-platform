@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_providers.dart';
+import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_actions_provider.dart';
 import 'package:evangelical_gospel_partner/core/data/providers/firestore_providers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +52,7 @@ class ProfilePage extends ConsumerWidget {
                   ),
                 ]),
                 const SizedBox(height: 48),
-                _buildLogoutButton(context),
+                _buildLogoutButton(context, ref),
               ],
             ),
           );
@@ -97,12 +98,12 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: OutlinedButton(
-        onPressed: () => _handleLogout(context),
+        onPressed: () => ref.read(authActionsProvider).logout(),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.redAccent),
           foregroundColor: Colors.redAccent,
@@ -113,12 +114,6 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleLogout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (context.mounted) {
-      context.go('/login');
-    }
-  }
 
   Color _getRoleColor(String role) {
     switch (role) {

@@ -41,8 +41,35 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+
     // 테넌트(Tenants) 컬렉션 규칙
     match /tenants/{tenantId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+      
+      // 테넌트별 멤버 서브컬렉션
+      match /members/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin() || (isSignedIn() && isOwner(userId));
+      }
+    }
+
+    // 신청(Applications) 컬렉션 규칙
+    match /applications/{appId} {
+      allow read: if isSignedIn() && (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isActive() && isOwner(request.resource.data.userId);
+      allow update: if isActive() && (isOwner(resource.data.userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // 접속 제어(Access Control) 컬렉션 규칙
+    match /access_control/{tenantId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // 운영자 권한(Operator Roles) 컬렉션 규칙
+    match /operator_roles/{roleId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }

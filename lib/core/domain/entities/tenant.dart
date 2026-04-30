@@ -25,4 +25,32 @@ class Tenant {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  Tenant copyWith({
+    String? id,
+    String? name,
+    String? displayName,
+    bool? isActive,
+    int? maxConcurrentUsers,
+    int? currentActiveUsers,
+    bool? gateEnabled,
+    String? primaryColor,
+    String? brandImageUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Tenant(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      displayName: displayName ?? this.displayName,
+      isActive: isActive ?? this.isActive,
+      maxConcurrentUsers: maxConcurrentUsers ?? this.maxConcurrentUsers,
+      currentActiveUsers: currentActiveUsers ?? this.currentActiveUsers,
+      gateEnabled: gateEnabled ?? this.gateEnabled,
+      primaryColor: primaryColor ?? this.primaryColor,
+      brandImageUrl: brandImageUrl ?? this.brandImageUrl,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

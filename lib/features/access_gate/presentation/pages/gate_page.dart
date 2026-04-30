@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:evangelical_gospel_partner/features/access_control/presentation/providers/access_control_provider.dart';
+import 'package:evangelical_gospel_partner/features/auth/presentation/providers/auth_actions_provider.dart';
 
 class GatePage extends ConsumerWidget {
   const GatePage({super.key});
@@ -107,11 +108,12 @@ class GatePage extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      TextButton(
-                        onPressed: () => context.go('/login'),
-                        child: Text(
-                          '로그인 화면으로 돌아가기',
-                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w600),
+                      TextButton.icon(
+                        onPressed: () => ref.read(authActionsProvider).logout(),
+                        icon: const Icon(Icons.logout_rounded, size: 18),
+                        label: const Text('로그아웃하여 계정 전환하기'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white.withOpacity(0.6),
                         ),
                       ),
                     ],
