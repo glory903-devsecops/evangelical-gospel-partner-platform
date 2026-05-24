@@ -5,11 +5,11 @@ import 'package:evangelical_gospel_partner/core/domain/entities/tenant.dart';
 
 void main() {
   group('Tenant Providers Test', () {
-    test('currentTenantIdProvider defaults to anguk', () {
+    test('currentTenantIdProvider defaults to null', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      expect(container.read(currentTenantIdProvider), 'anguk');
+      expect(container.read(currentTenantIdProvider), isNull);
     });
 
     test('currentTenantIdProvider updates value correctly', () {

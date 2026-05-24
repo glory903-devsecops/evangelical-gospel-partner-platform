@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'config/routes/router.dart';
 import 'features/auth/presentation/providers/auth_providers.dart';
+import 'features/auth/presentation/providers/auth_actions_provider.dart';
 import 'core/services/session_service.dart';
 
 void main() async {
